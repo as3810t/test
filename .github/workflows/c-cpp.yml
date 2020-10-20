@@ -34,7 +34,7 @@ jobs:
         chmod +x build-wrapper-linux-x86/build-wrapper-linux-x86-64
     - name: sonar-scanner
       run: |
-        curl -L -Ohttps://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip
+        curl -L -O https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip
         unzip sonar-scanner-cli-4.4.0.2170-linux.zip
         chmod +x sonar-scanner-cli-4.4.0.2170-linux/bin/sonar-scanner
     - name: coverage
