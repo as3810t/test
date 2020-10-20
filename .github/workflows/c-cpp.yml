@@ -32,16 +32,15 @@ jobs:
         curl -L -O https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
         unzip build-wrapper-linux-x86.zip
         chmod +x build-wrapper-linux-x86/build-wrapper-linux-x86-64
+    - name: sonar-scanner
+      run: |
+        curl -L -Ohttps://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip
+        unzip sonar-scanner-cli-4.4.0.2170-linux.zip
+        chmod +x sonar-scanner-cli-4.4.0.2170-linux/bin/sonar-scanner
     - name: coverage
       run: build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean coverage-all
     - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master   
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.organization=as3810t
-          -Dsonar.projectKey=as3810t_test
-          -Dsonar.sources=src
-          -Dsonar.cfamily.build-wrapper-output=bw-output
+      run: sonar-scanner-cli-4.4.0.2170-linux/bin/sonar-scanner -Dsonar.host.url="https://sonarcloud.io"
