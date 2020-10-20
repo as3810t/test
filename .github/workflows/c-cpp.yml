@@ -1,0 +1,48 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencis
+      run: sudo apt-get install -y lcov libcppunit-dev build-essential
+  
+    - name: build
+      run: make all
+    - name: test
+      run: make test
+  analyze:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./native
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencis
+      run: sudo apt-get install -y lcov libcppunit-dev build-essential curl
+    - name: build-wrapper
+      run: |
+        curl -L -O https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+        unzip build-wrapper-linux-x86.zip
+        chmod +x build-wrapper-linux-x86/build-wrapper-linux-x86-64
+    - name: coverage
+      run: build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean coverage-all
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master   
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        projectBaseDir: native
+        args: >
+          -Dsonar.organization=as3810t
+          -Dsonar.projectKey=as3810t_test
+          -Dsonar.sources=src
+          -Dsonar.cfamily.build-wrapper-output=bw-output
